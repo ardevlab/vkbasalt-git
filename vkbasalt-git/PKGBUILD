@@ -28,7 +28,14 @@ arch=('x86_64')
 url='https://github.com/DadSchoorse/vkBasalt'
 license=(zlib)
 makedepends=(meson ninja glslang libx11 spirv-headers vulkan-headers)
-depends=(gcc-libs glslang libx11)
+if [[ "$_compiler" = "1" ]]; then
+  makedepends+=(gcc gcc-libs)
+  depends=(gcc-libs glslang libx11)
+fi
+if [[ "$_compiler" = "2" ]]; then
+  makedepends+=(clang llvm llvm-libs)
+  depends=(llvm-libs glslang libx11)
+fi
 optdepends=(reshade-shaders)
 provides=(vkbasalt vkbasalt-git)
 source=(git+https://github.com/DadSchoorse/vkBasalt.git)
