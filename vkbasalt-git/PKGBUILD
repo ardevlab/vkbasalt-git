@@ -1,0 +1,92 @@
+# _     _            _        _          _____
+#| |__ | | __ _  ___| | _____| | ___   _|___ /
+#| '_ \| |/ _` |/ __| |/ / __| |/ / | | | |_ \
+#| |_) | | (_| | (__|   <\__ \   <| |_| |___) |
+#|_.__/|_|\__,_|\___|_|\_\___/_|\_\\__, |____/
+#                                  |___/
+
+#Maintainer: blacksky3 <blacksky3@tuta.io> <https://github.com/blacksky3>
+#Credits: gee
+#Credits: yochananmarqos, bpierre, PedroHLC, rodrigo21
+
+#######################################
+
+#Set '1' to build with GCC
+#Set '2' to build with CLANG
+#Default is empty. It will build with GCC. To build with different compiler just use : env _compiler=(1 or 2) makepkg -s
+if [ -z ${_compiler+x} ]; then
+  _compiler=
+fi
+
+#######################################
+
+pkgname=vkbasalt-git
+pkgver=0.3.2.5.r0.gd0d37e9
+pkgrel=1
+pkgdesc='A Vulkan post-processing layer. Some of the effects are CAS, FXAA, SMAA, deband (git version)'
+arch=('x86_64')
+url='https://github.com/DadSchoorse/vkBasalt'
+license=(zlib)
+makedepends=(meson ninja glslang libx11 spirv-headers vulkan-headers)
+depends=(gcc-libs glslang libx11)
+optdepends=(reshade-shaders)
+provides=(vkbasalt vkbasalt-git)
+source=(git+https://github.com/DadSchoorse/vkBasalt.git)
+sha256sums=(SKIP)
+
+pkgver(){
+ cd ${srcdir}/vkBasalt
+ # cutting off 'foo-' prefix that presents in the git tag
+ #git describe --long | sed 's/^v//;s/\([^-]*-g\)/r\1/;s/-/./g'
+ git describe --long --tags | sed 's/^v//;s/\([^-]*-g\)/r\1/;s/-/./g'
+
+ #git describe --long | sed 's/\([^-]*-g\)/r\1/;s/-/./g'
+ #git describe --long --tags | sed 's/\([^-]*-g\)/r\1/;s/-/./g'
+}
+
+build(){
+if [[ $_compiler = "1" ]]; then
+  export CC='gcc'
+  export CXX='g++'
+elif [[ $_compiler = "2" ]]; then
+  export CC='clang'
+  export CXX='clang++'
+else
+  export CC='gcc'
+  export CXX='g++'
+fi
+
+  cd ${srcdir}/vkBasalt
+
+  rm -rf -v build_64
+
+  mkdir build_64
+
+  meson setup build_64/ \
+  -D buildtype=release \
+  -D prefix=/usr \
+  -D libdir=lib \
+  -D with_so=true \
+  -D with_json=true \
+  -D append_libdir_vkbasalt=false
+
+  meson configure build_64/
+
+  meson compile -C build_64/
+
+  ninja -C build_64/
+}
+
+package(){
+  DESTDIR="${pkgdir}" ninja -C ${srcdir}/vkBasalt/build_64 install
+
+  mv "${pkgdir}"/usr/share/vulkan/implicit_layer.d/vkBasalt.json "${pkgdir}"/usr/share/vulkan/implicit_layer.d/vkBasalt.x86_64.json
+
+  sed -i 's|VK_LAYER_VKBASALT_post_processing|VK_LAYER_VKBASALT_post_processing_64|g' "${pkgdir}"/usr/share/vulkan/implicit_layer.d/vkBasalt.x86_64.json
+
+  sed -i 's|libvkbasalt.so|/usr/lib/libvkbasalt.so|g' "${pkgdir}"/usr/share/vulkan/implicit_layer.d/vkBasalt.x86_64.json
+
+  install -Dm 644 ${srcdir}/vkBasalt/config/vkBasalt.conf "${pkgdir}"/etc/vkBasalt.conf
+
+  install -Dm644 ${srcdir}/vkBasalt/LICENSE -T "$pkgdir"/usr/share/licenses/${pkgname}/LICENSE
+}
