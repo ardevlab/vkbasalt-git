@@ -1,4 +1,12 @@
-# Maintainer: gee
+# _     _            _        _          _____
+#| |__ | | __ _  ___| | _____| | ___   _|___ /
+#| '_ \| |/ _` |/ __| |/ / __| |/ / | | | |_ \
+#| |_) | | (_| | (__|   <\__ \   <| |_| |___) |
+#|_.__/|_|\__,_|\___|_|\_\___/_|\_\\__, |____/
+#                                  |___/
+
+#Maintainer: blacksky3 <blacksky3@tuta.io> <https://github.com/blacksky3>
+#Credits: gee
 
 pkgname=reshade-shaders-git
 pkgdesc='A collection of post-processing shaders written in the ReShade FX shader language, to be used by vkBasalt (git version)'
