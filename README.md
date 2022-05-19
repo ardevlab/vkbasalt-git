@@ -1,7 +1,7 @@
 # vkbasalt-git
 
 
-# rashade-shaders
+# shaders
 
 Add this to your vkBasalt.conf : 
 
