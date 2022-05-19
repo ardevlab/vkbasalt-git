@@ -5,7 +5,7 @@
 
 Add this to your vkBasalt.conf : 
 
-effects = FakeHDR:FakeMotionBlur:AmbientLight
+    effects = FakeHDR:FakeMotionBlur:AmbientLight
 
     3DFX = /usr/share/reshade-shaders/shaders/3DFX.fx
     AdaptiveFog = /usr/share/reshade-shaders/shaders/AdaptiveFog.fx
