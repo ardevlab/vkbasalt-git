@@ -54,11 +54,11 @@ export PKG_CONFIG_PATH=/usr/lib32/pkgconfig
   -D with_json=true \
   -D append_libdir_vkbasalt=false
 
-  meson configure build_32/
+  #meson configure build_32/
+  
+  ninja -v -C build_32/
 
   meson compile -v -C build_32/
-
-  ninja -v -C build_32/
 }
 
 package(){
