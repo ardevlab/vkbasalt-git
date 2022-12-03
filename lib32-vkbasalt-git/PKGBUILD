@@ -56,9 +56,9 @@ export PKG_CONFIG_PATH=/usr/lib32/pkgconfig
 
   #meson configure build_32/
   
-  ninja -v -C build_32/
+  ninja -C build_32/
 
-  meson compile -v -C build_32/
+  meson compile -C build_32/
 }
 
 package(){
