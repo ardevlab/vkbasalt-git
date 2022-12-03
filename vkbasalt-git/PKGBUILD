@@ -48,11 +48,11 @@ build(){
   -D with_json=true \
   -D append_libdir_vkbasalt=false
 
-  meson configure build_64/
+  #meson configure build_64/
+  
+  ninja -C build_64/
 
   meson compile -C build_64/
-
-  ninja -C build_64/
 }
 
 package(){
