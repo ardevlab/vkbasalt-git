@@ -16,7 +16,7 @@ arch=(any)
 url='https://github.com/crosire/reshade-shaders'
 license=(custom)
 makedepends=(git)
-source=(git+https://github.com/crosire/reshade-shaders.git#branch=master)
+source=(git+https://github.com/crosire/reshade-shaders.git#branch=slim)
 sha256sums=(SKIP)
 
 pkgver(){
