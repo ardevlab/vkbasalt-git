@@ -1,70 +1,71 @@
-# _     _            _        _          _____
-#| |__ | | __ _  ___| | _____| | ___   _|___ /
-#| '_ \| |/ _` |/ __| |/ / __| |/ / | | | |_ \
-#| |_) | | (_| | (__|   <\__ \   <| |_| |___) |
-#|_.__/|_|\__,_|\___|_|\_\___/_|\_\\__, |____/
-#                                  |___/
-
-#Maintainer: blacksky3 <https://github.com/blacksky3>
+#Maintainer: archdevlab <https://github.com/archdevlab>
 #Credits: gee
+#Credits: Zeioth <zeioth@hotmail.com>
+#Credits: FabioLolix <fabio.loli@disroot.org>
 #Credits: yochananmarqos, bpierre, PedroHLC, rodrigo21
 
 pkgname=lib32-vkbasalt-git
-pkgver=0.3.2.5.r0.gd0d37e9
+pkgdesc='A Vulkan post processing layer to enhance the visual graphics of games (32-bit) (git version)'
+pkgver=0.3.2.10.r0.g4f97f09
 pkgrel=1
-pkgdesc='A Vulkan post-processing layer. Some of the effects are CAS, FXAA, SMAA, deband (32-bit) (git version)'
-arch=('x86_64')
+arch=(i686 x86_64)
 url='https://github.com/DadSchoorse/vkBasalt'
 license=(zlib)
 makedepends=(meson ninja glslang libx11 lib32-libx11 spirv-headers vulkan-headers gcc gcc-libs lib32-gcc-libs git)
-depends=(gcc-libs glslang libx11 lib32-gcc-libs lib32-libx11 vkbasalt)
+depends=(gcc-libs glslang libx11 lib32-gcc-libs lib32-libx11 vkbasalt-git)
+optdepends=(reshade-shaders-git)
 provides=(lib32-vkbasalt lib32-vkbasalt-git)
 source=(git+https://github.com/DadSchoorse/vkBasalt.git)
-sha256sums=(SKIP)
 
 pkgver(){
- cd ${srcdir}/vkBasalt
- # cutting off 'foo-' prefix that presents in the git tag
+ cd "${srcdir}"/vkBasalt
  git describe --long --tags --abbrev=7 | sed 's/^v//;s/\([^-]*-g\)/r\1/;s/-/./g'
 }
 
 build(){
-export CC='gcc -m32'
-export CXX='g++ -m32'
-export ASFLAGS=--32
-export CFLAGS=-m32
-export CXXFLAGS=-m32
-export PKG_CONFIG_PATH=/usr/lib32/pkgconfig
+export CFLAGS+=" -m32"
+export CXXFLAGS+=" -m32"
+export LDFLAGS+=" -m32"
+export ASFLAGS+=" --32"
+export PKG_CONFIG="i686-pc-linux-gnu-pkg-config"
+export PKG_CONFIG_PATH="/usr/lib32/pkgconfig"
 
-  cd ${srcdir}/vkBasalt
+  rm -rf "${srcdir}"/build
 
-  rm -rf -v build_32
+  local meson_options=(
+    --cross-file lib32
+    -D b_ndebug=true
+    -D b_lto=false
+    -D buildtype=plain
+    --wrap-mode=nofallback
+    -D prefix=/usr
+    -D bindir=bin
+    -D datadir=share
+    -D includedir=include
+    -D libdir=lib32
+    -D sysconfdir=/etc
+    -D with_so=true
+    -D with_json=true
+    -D append_libdir_vkbasalt=false
+  )
 
-  mkdir build_32
-
-  meson setup build_32/ \
-  -D buildtype=release \
-  -D prefix=/usr \
-  -D libdir=lib32 \
-  -D with_so=true \
-  -D with_json=true \
-  -D append_libdir_vkbasalt=false
-
-  #meson configure build_32/
-  
-  ninja -C build_32/
-
-  meson compile -C build_32/
+  meson "${srcdir}"/vkBasalt "${srcdir}"/build "${meson_options[@]}"
+  meson configure --no-pager "${srcdir}"/build
+  meson compile -C "${srcdir}"/build
 }
 
 package(){
-  DESTDIR="${pkgdir}" ninja -C ${srcdir}/vkBasalt/build_32 install
+  DESTDIR="${pkgdir}" meson install -C "${srcdir}"/build
 
   mv "${pkgdir}"/usr/share/vulkan/implicit_layer.d/vkBasalt.json "${pkgdir}"/usr/share/vulkan/implicit_layer.d/vkBasalt.i686.json
-
   sed -i 's|VK_LAYER_VKBASALT_post_processing|VK_LAYER_VKBASALT_post_processing_32|g' "${pkgdir}"/usr/share/vulkan/implicit_layer.d/vkBasalt.i686.json
-
   sed -i 's|libvkbasalt.so|/usr/lib32/libvkbasalt.so|g' "${pkgdir}"/usr/share/vulkan/implicit_layer.d/vkBasalt.i686.json
 
-  install -Dm644 ${srcdir}/vkBasalt/LICENSE -T "$pkgdir"/usr/share/licenses/${pkgname}/LICENSE
+  # install license
+  install -dm755 "${pkgdir}"/usr/share/licenses/"${pkgname}"
+  install -m644 "${srcdir}"/vkBasalt/LICENSE "${pkgdir}"/usr/share/licenses/"${pkgname}"/
 }
+
+sha256sums=(SKIP)
+
+# vim:set ts=8 sts=2 sw=2 et:
