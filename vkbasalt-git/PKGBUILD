@@ -5,7 +5,7 @@
 #Credits: yochananmarqos, bpierre, PedroHLC, rodrigo21
 
 pkgname=vkbasalt-git
-pkgdesc='A Vulkan post-processing layer. Some of the effects are CAS, FXAA, SMAA, deband (git version)'
+pkgdesc='A Vulkan post processing layer to enhance the visual graphics of games (git version)'
 pkgver=0.3.2.10.r0.g4f97f09
 pkgrel=1
 arch=(x86_64)
