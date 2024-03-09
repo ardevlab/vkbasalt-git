@@ -12,55 +12,56 @@ optdepends=(vkbasalt lib32-vkbasalt)
 source=(git+https://github.com/crosire/reshade-shaders.git#branch=list)
 
 pkgver(){
-  cd "reshade-shaders"
+  cd "${srcdir}"/reshade-shaders
   echo .r$(git rev-list --count HEAD).g$(git rev-parse --short=7 HEAD)
 }
 
 build(){
-  rm -rf ${srcdir}/{Shaders,Textures}
-  mkdir ${srcdir}/{Shaders,Textures}
+  rm -rf "${srcdir}"/{Shaders,Textures}
+  mkdir "${srcdir}"/{Shaders,Textures}
 
+folder=""
 while read -r line
-do  
-  if [[ "$line" == "InstallPath"* ]]; then 
-    folder=${line:38}
+do
+  if [[ "${line}" == "InstallPath"* ]]; then
+    folder="${line:38}"
   fi
 
-  if [[ "$line" == "DownloadUrl"* ]]; then
-    url=${line:12}
-    msg2 "Download $url"
-    curl  -L "$url" -o file.zip
+  if [[ "${line}" == "DownloadUrl"* ]]; then
+    url="${line:12}"
+    msg2 "Download ${url}"
+    curl  -L "${url}" -o file.zip
     unzip file.zip
     rm file.zip
-    mkdir -p ${srcdir}/Shaders/$folder
-    msg "$folder"
-      
-    if [[ "$folder" == "CRT-Royale" ]]; then 
-      mv crt-royale-reshade-master/reshade-shaders/Shaders/*.* ${srcdir}/Shaders/$folder/
-    elif [[ "$folder" == "CShade" ]]; then
-      mv CShade-main/shaders/*.* ${srcdir}/Shaders/$folder/
+    mkdir -p "${srcdir}"/Shaders/"${folder}"
+    msg2 "${folder}"
+
+    if [[ "${folder}" == "CRT-Royale" ]]; then
+      mv -v "${srcdir}"/crt-royale-reshade-master/reshade-shaders/Shaders/*.* "${srcdir}"/Shaders/"${folder}"/
+    elif [[ "${folder}" == "CShade" ]]; then
+      mv -v "${srcdir}"/CShade-main/shaders/*.* "${srcdir}"/Shaders/"${folder}"/
     else
-      mv */Shaders/*.* ${srcdir}/Shaders/$folder/ 2> /dev/null || true
-      mv */Textures/*.* ${srcdir}/Textures/ 2> /dev/null || true
+      mv -v "${srcdir}"/*/Shaders/*.* "${srcdir}"/Shaders/"${folder}"/ 2> /dev/null || true
+      mv -v "${srcdir}"/*/Textures/*.* "${srcdir}"/Textures/ 2> /dev/null || true
     fi
   fi
-done < ${srcdir}/reshade-shaders/EffectPackages.ini
+done < "${srcdir}"/reshade-shaders/EffectPackages.ini
 }
 
 package(){
-  install -dm755 "${pkgdir}/opt/reshade/shaders"
-  cp -r ${srcdir}/Shaders/* "${pkgdir}/opt/reshade/shaders/"
+  install -dm755 "${pkgdir}"/opt/reshade/shaders
+  cp -r -v "${srcdir}"/Shaders/* "${pkgdir}"/opt/reshade/shaders/
 
   #for dir in ${srcdir}/Shaders/*/
   #do
   #  mv "$dir" "${pkgdir}/opt/reshade/shaders"
   #done
-  
-  install -dm755 "${pkgdir}/opt/reshade/textures"
-  cp -r ${srcdir}/Textures/*  "${pkgdir}/opt/reshade/textures/"
 
-  find ${pkgdir}/ -type d -print0 | xargs -0 chmod 755
-  find ${pkgdir}/ -type f -print0 | xargs -0 chmod 644
+  install -dm755 "${pkgdir}"/opt/reshade/textures
+  cp -r -v "${srcdir}"/Textures/*  "${pkgdir}"/opt/reshade/textures/
+
+  find "${pkgdir}"/ -type d -print0 | xargs -0 chmod 755
+  find "${pkgdir}"/ -type f -print0 | xargs -0 chmod 644
 }
 
 sha256sums=(SKIP)
