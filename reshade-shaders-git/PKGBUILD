@@ -1,4 +1,5 @@
-#Maintainer: gee
+#Maintainer: archdevlab <https://github.com/archdevlab>
+#Credits: gee
 
 pkgname=reshade-shaders-git
 pkgdesc='A collection of post-processing shaders written for ReShade'
@@ -65,3 +66,5 @@ package(){
 }
 
 sha256sums=(SKIP)
+
+# vim:set ts=8 sts=2 sw=2 et:
